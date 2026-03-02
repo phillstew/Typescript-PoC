@@ -1,7 +1,7 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext, input, FunctionInput } from "@azure/functions";
 
 export class DataConnection {
-    constructor(public alias: string) {}
+    constructor(public alias: string, public argName: string) {}
 }
 
 export type FabricConnection = {
@@ -47,7 +47,7 @@ export abstract class Udf {
     // Store input bindings for connections per function
     inputBindings: { [key: string]: FunctionInput[] } = {};
 
-    func<T extends {}>(name: string, fn: (context:FabricContext, ...args: any[]) => any, connections?: DataConnection[]) {
+    func<T extends {}>(name: string, fn: (...args: any[]) => any, connections?: DataConnection[]) {
     
         let extraInputs = [];
         if (connections) {
@@ -88,6 +88,8 @@ export abstract class Udf {
 }
 
 export class FabricUdf extends Udf {
+
+    data: {};
 
     async prepareContext(request: HttpRequest, context: InvocationContext): Promise<FabricContext> {
         

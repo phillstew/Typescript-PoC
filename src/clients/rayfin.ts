@@ -13,4 +13,3 @@ client.helloRayfinFunc.call({ name: "Alice", age: 30 }).then(async response => {
     console.log(response.message);
 });
 
-
