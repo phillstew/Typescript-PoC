@@ -1,5 +1,5 @@
 
-import { MyFunctionSchema } from "../functions/rayfin";
+import { FabricFunctionSchema } from "../functions/fabric";
 import { RayfinClientGenerator } from "../rayfin/clientGenerator";
 
 
@@ -7,9 +7,9 @@ import { RayfinClientGenerator } from "../rayfin/clientGenerator";
 
 let generator = new RayfinClientGenerator();
 
-let client = generator.generateClient<MyFunctionSchema>();
+let client = generator.generateClient<FabricFunctionSchema>();
 
-client.helloRayfinFunc.call({ name: "Alice", age: 30 }).then(async response => {
+client.addTodo.call({ title: "Sample Todo", completed: false, id: 1 }).then(async response => {
     console.log(response.message);
 });
 

@@ -9,33 +9,33 @@ import { FabricContext, DataConnection, FabricSqlConnection } from "../fabric/ud
 // Currently the Context here is named FabricContext but will more likely be a generic Context object for
 //    unique aspects of Fabric or Rayfin
 
-const rayfinFunctions = new RayfinFunctions();
+// const rayfinFunctions = new RayfinFunctions();
 
-type HelloRayfinTypes = RayfinFunctionSchema<PersonDto, ResponseDto>;
+// type HelloRayfinTypes = RayfinFunctionSchema<PersonDto, ResponseDto>;
 
-// Hello Rayfin Function - No connections, just input and output
+// // Hello Rayfin Function - No connections, just input and output
 
-async function helloRayfinFunc(context: FabricContext, input: PersonDto) : Promise<ResponseDto> {
-    return { message: `Hello, ${input.name}! You are ${input.age} years old.` };
-}
+// async function helloRayfinFunc(context: FabricContext, input: PersonDto) : Promise<ResponseDto> {
+//     return { message: `Hello, ${input.name}! You are ${input.age} years old.` };
+// }
 
-rayfinFunctions.func<HelloRayfinTypes>(helloRayfinFunc);
+// rayfinFunctions.func<HelloRayfinTypes>(helloRayfinFunc);
 
-// Hello Rayfin Function - With connections. Both using the same input type.
+// // Hello Rayfin Function - With connections. Both using the same input type.
 
-var myAlias = new DataConnection("myAlias");
+// var myAlias = new DataConnection("myAlias");
 
-async function helloRayfinFuncWithConnections(context: FabricContext, input: PersonDto) : Promise<ResponseDto> {
-    const sqlConn = context.getConnection<FabricSqlConnection>("myAlias");
+// async function helloRayfinFuncWithConnections(context: FabricContext, input: PersonDto) : Promise<ResponseDto> {
+//     const sqlConn = context.getConnection<FabricSqlConnection>("myAlias");
     
-    // sqlConn.RunSql("...")
+//     // sqlConn.RunSql("...")
     
-    return { message: `Hello, ${input.name}! You are ${input.age} years old.` };
-}
+//     return { message: `Hello, ${input.name}! You are ${input.age} years old.` };
+// }
 
-rayfinFunctions.func<HelloRayfinTypes>(helloRayfinFuncWithConnections, [myAlias]);
+// rayfinFunctions.func<HelloRayfinTypes>(helloRayfinFuncWithConnections, [myAlias]);
 
-export type MyFunctionSchema = {
-    helloRayfinFunc: HelloRayfinTypes;
-    helloRayfinFuncWithConnections: HelloRayfinTypes;
-}
+// export type MyFunctionSchema = {
+//     helloRayfinFunc: HelloRayfinTypes;
+//     helloRayfinFuncWithConnections: HelloRayfinTypes;
+// }

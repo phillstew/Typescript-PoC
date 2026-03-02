@@ -2,6 +2,8 @@ import { FabricContext, FabricUdf, DataConnection, FabricSqlConnection } from ".
 import { PersonDto } from "../sharedTypes/person";
 import { Todo } from "../sharedTypes/todo";
 
+import { RayfinFunctionSchema } from "../rayfin/functions";
+
 // Fabric UDFs
 
 const udf = new FabricUdf();
@@ -83,7 +85,6 @@ udf.func<Todo>("addTodoSpreadParamsFail", async (id: number, title: string, comp
 }, [myTodoDbConn]);
 
 /*
-
 Function Registration: "addTodoSpreadParamsFail"
   File: fabric.ts
   Async: true
@@ -160,3 +161,11 @@ udf.func("listTodos", async (myTodoDbConn: FabricSqlConnection) : Promise<Todo[]
       Position 0: myTodoDbConn (FabricSqlConnection)
     Business Parameters: 0
 */
+
+
+// Only thing required for Rayfin is to export the type signature of each function
+export type FabricFunctionSchema = {
+    addTodo: RayfinFunctionSchema<Todo, { success: boolean; message: string }>;
+    getTodo: RayfinFunctionSchema<number, Todo>;
+    listTodos: RayfinFunctionSchema<undefined, Todo[]>;
+}
