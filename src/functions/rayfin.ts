@@ -1,6 +1,6 @@
 import { RayfinFunctions, RayfinFunctionSchema } from "../rayfin/functions";
 import { PersonDto, ResponseDto } from "../sharedTypes/person";
-import { FabricContext } from "../fabric/udf";
+import { FabricContext, DataConnection, FabricSqlConnection } from "../fabric/udf";
 
 // Rayfin version - Define once, use everywhere
 
@@ -13,12 +13,29 @@ const rayfinFunctions = new RayfinFunctions();
 
 type HelloRayfinTypes = RayfinFunctionSchema<PersonDto, ResponseDto>;
 
+// Hello Rayfin Function - No connections, just input and output
+
 async function helloRayfinFunc(context: FabricContext, input: PersonDto) : Promise<ResponseDto> {
     return { message: `Hello, ${input.name}! You are ${input.age} years old.` };
 }
 
 rayfinFunctions.func<HelloRayfinTypes>(helloRayfinFunc);
 
+// Hello Rayfin Function - With connections. Both using the same input type.
+
+var myAlias = new DataConnection("myAlias");
+
+async function helloRayfinFuncWithConnections(context: FabricContext, input: PersonDto) : Promise<ResponseDto> {
+    const sqlConn = context.getConnection<FabricSqlConnection>("myAlias");
+    
+    // sqlConn.RunSql("...")
+    
+    return { message: `Hello, ${input.name}! You are ${input.age} years old.` };
+}
+
+rayfinFunctions.func<HelloRayfinTypes>(helloRayfinFuncWithConnections, [myAlias]);
+
 export type MyFunctionSchema = {
     helloRayfinFunc: HelloRayfinTypes;
+    helloRayfinFuncWithConnections: HelloRayfinTypes;
 }
