@@ -19,6 +19,7 @@ udf.func<Todo>("addTodo", async (todo: Todo, myTodoDbConn: FabricSqlConnection) 
     
     // Logic to add the todo item to a database or in-memory store
     console.log(`Adding todo: ${todo.title}`);
+    console.log(`Using connection: ${myTodoDbConn.database} with accessKey: ${myTodoDbConn.accessKey}`);
     // myTodoDbConn.sql("INSERT INTO todos (title, completed) VALUES (?, ?)", [todo.title, todo.completed]);
 
     return { success: true, message: `Todo '${todo.title}' added successfully!` };

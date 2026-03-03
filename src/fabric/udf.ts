@@ -1,5 +1,5 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext, input, FunctionInput } from "@azure/functions";
-import { TypeScriptProjectParser } from "../func-parser/parser";
+import { FabricUdfFunctionInfo, TypeScriptProjectParser } from "../func-parser/parser";
 
 
 export class DataConnection {
@@ -64,7 +64,8 @@ export abstract class Udf {
                 // For alias'd connections
                 let newInput = input.generic({
                         type: "FabricItem",
-                        alias: conn.alias
+                        alias: conn.alias,
+                        argName: conn.argName
                     });
                 extraInputs.push(newInput);
             });
@@ -79,12 +80,37 @@ export abstract class Udf {
             authLevel: 'anonymous',
             handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
                 // Before run
-                const args = await this.prepareParameters<T>(request, context);
+                // const args = await this.prepareParameters<T>(request, context);
+                
+                const functionName = context.functionName;
+                const functionMetadata = this.getFunctionMetadata(functionName);
+                const requestBody = await request.json();
 
-                const fabricContext: FabricContext = await this.prepareContext(request, context);
+                // Get arguments in correct order based on metadata and whether they are fabric parameters or business parameters
+                const args = functionMetadata.delegateParameters.map(param => {
+                    if(param.isFabricParameter){
+                        // Load from DI container or context
+                        if(param.type  === "FabricSqlConnection"){
+                            let binding = this.inputBindings[functionName].filter(input => input.argName === param.name)[0];
+                            return context.extraInputs.get(binding) as FabricConnection; // Would want to parse this input binding into something real
+                        }
+                    } else {
+                        // Load from request
+                        if(!!functionMetadata.genericType && param.type === functionMetadata.genericType.typeName){
+                            // If we have a generic type, we can attempt to validate the business parameters against the structure of that generic type
+                            // For simplicity, we'll assume the entire body is the generic type and skip individual parameter validation in this example
+                            return requestBody as T;
+                        } else {
+                            return requestBody[param.name];
+
+                        }
+                    }
+                });
+                
+                // const fabricContext: FabricContext = await this.prepareContext(request, context);
 
                 // Run the function
-                var resp = await fn(fabricContext, ...args); // This is where you'd extract args from the request and call the function
+                var resp = await fn(...args); // This is where you'd extract args from the request and call the function
                 
                 const response = await this.prepareResponse(request, context, resp);
 
@@ -102,6 +128,11 @@ export abstract class Udf {
     logParserSummary() {
         this.parser.generateSummaryReport();
     }
+
+    getFunctionMetadata(functionName: string) : FabricUdfFunctionInfo {
+        return this.parser.getAllFabricUdfFunctions().filter(func => func.functionName === functionName)[0];
+    }
+
 }
 
 export class FabricUdf extends Udf {
