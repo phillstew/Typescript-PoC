@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-ts",
+    "copy-ts": "robocopy src dist\\src *.ts /S /NFL /NDL /NJH /NJS || exit 0",
     "watch": "tsc -w",
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",

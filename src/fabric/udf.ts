@@ -1,4 +1,6 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext, input, FunctionInput } from "@azure/functions";
+import { TypeScriptProjectParser } from "../func-parser/parser";
+
 
 export class DataConnection {
     constructor(public alias: string, public argName: string) {}
@@ -47,6 +49,13 @@ export abstract class Udf {
     // Store input bindings for connections per function
     inputBindings: { [key: string]: FunctionInput[] } = {};
 
+    customFabricTypes = []; // Example custom types
+    parser : TypeScriptProjectParser;
+
+    constructor() {
+        this.parser = new TypeScriptProjectParser("./dist/src/functions", this.customFabricTypes);
+    }
+
     func<T extends {}>(name: string, fn: (...args: any[]) => any, connections?: DataConnection[]) {
     
         let extraInputs = [];
@@ -84,6 +93,14 @@ export abstract class Udf {
             },
             extraInputs: extraInputs
         });
+    }
+
+    async start () {
+        await this.parser.scanProject();
+    }
+
+    logParserSummary() {
+        this.parser.generateSummaryReport();
     }
 }
 

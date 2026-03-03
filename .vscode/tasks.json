@@ -12,8 +12,13 @@
 		{
 			"type": "shell",
 			"label": "npm build (functions)",
-			"command": "npm run build",
+			"command": "npm",
+			"args": ["run", "build"],
 			"dependsOn": "npm clean (functions)",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
 			"problemMatcher": "$tsc"
 		},
 		{
